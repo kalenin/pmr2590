@@ -2,8 +2,6 @@
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Zend\Crypt\BlockCipher;
-use Zend\Crypt\Symmetric\Mcrypt;
-
 
 // timezone
 date_default_timezone_set('America/Sao_Paulo');
@@ -12,26 +10,22 @@ date_default_timezone_set('America/Sao_Paulo');
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $app = new Silex\Application();
-$app['debug'] = true;
-/* Connect to mysql database */
-$dsn = 'mysql:dbname=teste;host=localhost;charset=utf8';
+
+/* Connect to mysql atabase */
+$dsn = 'mysql:dbname=teste;host=127.0.0.1;charset=utf8';
 try {
-    $dbh = new PDO($dsn, 'livros', 'livros2016');
+    $dbh = new PDO($dsn, 'root', 'root');
 } catch (PDOException $e) {
     echo 'Connection failed: ' . $e->getMessage();
 }
+$app->get('/', function(){
+  $blockCipher = BlockCipher::factory('mcrypt', array('algo' => 'aes'));
+  $blockCipher->setKey('encryption key');
+  $result = $blockCipher->encrypt('this is a secret message');
+  return "Encrypted text: $result \n";
 
-/* Rotas */
-$app->get('/', function () use ($app, $dbh) {
-
-    $blockCipher = BlockCipher::factory('mcrypt', array('algo' => 'aes'));
-    $blockCipher->setKey('encryption key');
-    $result = $blockCipher->encrypt('this is a secret message');
-    echo "Encrypted text: $result \n";
-    die;
 });
-
-
+/* Rotas */
 $app->get('/livros', function () use ($app, $dbh) {
     // consulta todos livros
     $sth = $dbh->prepare('SELECT id, titulo, autor, isbn FROM livros');
@@ -54,7 +48,6 @@ $app->get('/livros/{id}', function ($id) use ($app, $dbh) {
     return $app->json($livro);
 })->assert('id', '\d+');
 
-
 // POST - incluir
 $app->post('/livros', function(Request $request) use ($app, $dbh) {
     $dados = json_decode($request->getContent(), true);
@@ -70,7 +63,6 @@ $app->post('/livros', function(Request $request) use ($app, $dbh) {
     $response->headers->set('Location', "/livros/$id");
     return $response;
 });
-
 
 // PUT - editar (toda estrutura)
 $app->put('/livros/{id}', function(Request $request, $id) use ($app, $dbh) {
@@ -97,5 +89,6 @@ $app->delete('/livros/{id}', function($id) use ($app, $dbh) {
     // registro foi excluido, retornar 204 - no content
     return new Response(null, 204);
 })->assert('id', '\d+');
+
 
 $app->run();
