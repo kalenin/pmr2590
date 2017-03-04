@@ -1,6 +1,10 @@
 <?php
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Zend\Crypt\BlockCipher;
+use Zend\Crypt\Symmetric\Mcrypt;
+
+
 // timezone
 date_default_timezone_set('America/Sao_Paulo');
 
@@ -8,7 +12,7 @@ date_default_timezone_set('America/Sao_Paulo');
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $app = new Silex\Application();
-
+$app['debug'] = true;
 /* Connect to mysql database */
 $dsn = 'mysql:dbname=teste;host=localhost;charset=utf8';
 try {
@@ -18,6 +22,16 @@ try {
 }
 
 /* Rotas */
+$app->get('/', function () use ($app, $dbh) {
+
+    $blockCipher = BlockCipher::factory('mcrypt', array('algo' => 'aes'));
+    $blockCipher->setKey('encryption key');
+    $result = $blockCipher->encrypt('this is a secret message');
+    echo "Encrypted text: $result \n";
+    die;
+});
+
+
 $app->get('/livros', function () use ($app, $dbh) {
     // consulta todos livros
     $sth = $dbh->prepare('SELECT id, titulo, autor, isbn FROM livros');
