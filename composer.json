@@ -1,6 +1,6 @@
 {
     "require": {
         "silex/silex": "~2.0",
-        "zendframework/zend-crypt": "^2.6"
+        "firebase/php-jwt": "^4.0"
     }
 }

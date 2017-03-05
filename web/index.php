@@ -1,30 +1,70 @@
 <?php
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Zend\Crypt\BlockCipher;
 
 // timezone
 date_default_timezone_set('America/Sao_Paulo');
 
 // web/index.php
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/JWTWrapper.php';
 
 $app = new Silex\Application();
 
-/* Connect to mysql atabase */
+$app['debug'] = true;
+
+/* Connect to mysql database */
 $dsn = 'mysql:dbname=teste;host=127.0.0.1;charset=utf8';
 try {
     $dbh = new PDO($dsn, 'root', 'root');
 } catch (PDOException $e) {
     echo 'Connection failed: ' . $e->getMessage();
 }
-$app->get('/', function(){
-  $blockCipher = BlockCipher::factory('mcrypt', array('algo' => 'aes'));
-  $blockCipher->setKey('encryption key');
-  $result = $blockCipher->encrypt('this is a secret message');
-  return "Encrypted text: $result \n";
 
+$app->get('/teste', function() use ($app) {
+
+    $jwt = JWTWrapper::encode([
+        'expiration_sec' => 3600,
+        'iss' => 'pmr2590.local',
+        'userdata' => [
+            'id' => 1,
+            'name' => 'Teste'
+        ]
+    ]);
+
+    $data = JWTWrapper::decode($jwt);
+    print_r($data);
+
+    return $jwt;
 });
+
+// Autenticacao
+$app->post('/auth', function (Request $request) use ($app) {
+    $dados = json_decode($request->getContent(), true);
+
+    if($dados['user'] == 'foo' && $dados['pass'] == 'bar') {
+        // autenticacao valida, gerar token
+        $jwt = JWTWrapper::encode([
+            'expiration_sec' => 3600,
+            'iss' => 'pmr2590.local',
+            'userdata' => [
+                'id' => 1,
+                'name' => 'Teste'
+            ]
+        ]);
+
+        return $app->json([
+            'login' => 'true',
+            'access_token' => $jwt
+        ]);
+    }
+
+    return $app->json([
+        'login' => 'false',
+        'message' => 'Login Inválido',
+    ]);
+});
+
 /* Rotas */
 $app->get('/livros', function () use ($app, $dbh) {
     // consulta todos livros
@@ -89,6 +129,31 @@ $app->delete('/livros/{id}', function($id) use ($app, $dbh) {
     // registro foi excluido, retornar 204 - no content
     return new Response(null, 204);
 })->assert('id', '\d+');
+// verificar autenticacao
+$app->before(function(Request $request, $app) {
+    $route = $request->get('_route');
+
+    if($route != 'POST_auth') {
+
+        $authorization = $request->headers->get("http-authorization");
+        list($jwt) = sscanf($authorization, 'Bearer %s');
+        if($jwt) {
+            try {
+                $app['jwt'] = JWTWrapper::decode($jwt);
+            } catch(Exception $ex) {
+                // nao foi possivel decodificar o token jwt
+                return new Response('Acesso nao autorizado', 400);
+            }
+
+        } else {
+            // nao foi possivel extrair token do header Authorization
+            return new Response('Token nao informado', 400);
+
+        }
+    }
+});
+
+
 
 
 $app->run();

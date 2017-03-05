@@ -4,19 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd372852f10256b02fbd1efba92d696fd
+class ComposerStaticInit99fe3a8275aab3b7b2b0729ce6d46d3f
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
-        'Z' => 
-        array (
-            'Zend\\Stdlib\\' => 12,
-            'Zend\\Math\\' => 10,
-            'Zend\\Crypt\\' => 11,
-        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
@@ -30,27 +24,14 @@ class ComposerStaticInitd372852f10256b02fbd1efba92d696fd
         'P' => 
         array (
             'Psr\\Log\\' => 8,
-            'Psr\\Container\\' => 14,
         ),
-        'I' => 
+        'F' => 
         array (
-            'Interop\\Container\\' => 18,
+            'Firebase\\JWT\\' => 13,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Zend\\Stdlib\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-stdlib/src',
-        ),
-        'Zend\\Math\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-math/src',
-        ),
-        'Zend\\Crypt\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-crypt/src',
-        ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
@@ -83,13 +64,9 @@ class ComposerStaticInitd372852f10256b02fbd1efba92d696fd
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
-        'Psr\\Container\\' => 
+        'Firebase\\JWT\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/container/src',
-        ),
-        'Interop\\Container\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
     );
 
@@ -106,9 +83,9 @@ class ComposerStaticInitd372852f10256b02fbd1efba92d696fd
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd372852f10256b02fbd1efba92d696fd::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd372852f10256b02fbd1efba92d696fd::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitd372852f10256b02fbd1efba92d696fd::$prefixesPsr0;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit99fe3a8275aab3b7b2b0729ce6d46d3f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit99fe3a8275aab3b7b2b0729ce6d46d3f::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit99fe3a8275aab3b7b2b0729ce6d46d3f::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }
